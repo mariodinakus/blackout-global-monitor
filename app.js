@@ -52,7 +52,7 @@ function providerRender(){
 }
 function latestItems(){
  let a=[];
- if(s.overview?.providers?.ok)for(const p of s.overview.providers.value)for(const e of p.incidents||[])a.push({kind:'OFFICIAL',tag:'pink',title:e.title,at:e.time,description:p.name+' · '+e.status,link:p.url});
+ if(s.overview?.providers?.ok)for(const p of s.overview.providers.value)for(const e of p.incidents||[])a.push({kind:'OFFICIAL',tag:'pink',title:e.title||e.name,at:e.time||e.updatedAt||e.createdAt,description:p.name+' · '+e.status,link:p.url});
  if(s.overview?.internet?.ok)for(const x of s.overview.internet.value.events.slice(0,35))a.push({kind:'IODA SIGNAL',tag:'yellow',title:'Connectivity anomaly · '+x.country,at:x.startedAt,description:'Observation, not necessarily active · '+x.sensor,link:'https://ioda.inetintel.cc.gatech.edu/'});
  if(s.news?.ok)for(const x of s.news.articles.slice(0,25))a.push({kind:'NEWS REPORT',tag:'',title:x.title,at:x.publishedAt,description:x.source+' · unverified news report',link:x.url});
  return a.sort((x,y)=>(Date.parse(y.at)||0)-(Date.parse(x.at)||0));
@@ -77,11 +77,15 @@ function overviewRender(){
 }
 function newsRender(){
  const d=s.news;
- if(!d?.ok){unavailable('newsFeed','GDELT unavailable. Εμφανίζονται μόνο αναφορές που διατέθηκαν από τις πηγές.');return}
+ if(!d?.ok){
+const reports=latestItems().filter(x=>x.kind!=='NEWS REPORT').slice(0,30);
+$('newsFeed').innerHTML='<div class="empty">GDELT news feed currently unavailable. Below are separately labeled official service reports and observed IODA connectivity signals, not independently verified news or confirmed power failures.</div>'+reports.map((x,i)=>'<a class="story" href="'+url(x.link)+'" target="_blank" rel="noopener noreferrer"><div class="story-index">'+String(i+1).padStart(2,'0')+'</div><div><h3 class="story-title">'+esc(x.title)+'</h3><div class="story-meta"><span class="story-lbl">'+esc(x.kind)+' · SOURCE-ATTRIBUTED</span><span>'+esc(x.description)+'</span><span>'+utc(x.at)+'</span></div></div></a>').join('');
+return
+}
  $('newsFeed').innerHTML=d.articles.length?d.articles.map((x,n)=>'<a class="story" href="'+url(x.url)+'" target="_blank" rel="noopener noreferrer"><div class="story-index">'+String(n+1).padStart(2,'0')+'</div><div><h3 class="story-title">'+esc(x.title)+'</h3><div class="story-meta"><span class="story-lbl">NEWS REPORT · UNVERIFIED</span><span>'+esc(x.source)+'</span><span>'+utc(x.publishedAt)+'</span></div></div></a>').join(''):'<div class="empty">No recent matching articles from this source.</div>';
 }
 function cyberRender(){
- $('cisaFeed').innerHTML=s.cyber?.ok&&s.cyber.items?.length?s.cyber.items.slice(0,6).map(x=>'<a class="kev" href="https://nvd.nist.gov/vuln/detail/'+encodeURIComponent(x.id)+'" target="_blank" rel="noopener noreferrer"><strong>'+esc(x.id)+' / '+esc(x.vendor)+'</strong><span>'+esc(x.dateAdded)+' · '+esc(x.name)+'</span></a>').join(''):'<div class="empty">CISA KEV unavailable</div>';
+ $('cisaFeed').innerHTML=s.cyber?.ok&&s.cyber.items?.length?s.cyber.items.slice(0,6).map(x=>'<a class="kev" href="https://nvd.nist.gov/vuln/detail/'+encodeURIComponent(x.id||x.cve)+'" target="_blank" rel="noopener noreferrer"><strong>'+esc(x.id||x.cve)+' / '+esc(x.vendor)+'</strong><span>'+esc(x.dateAdded)+' · '+esc(x.name)+'</span></a>').join(''):'<div class="empty">CISA KEV unavailable</div>';
 }
 function plot(id,raw,color){
  const el=$(id),arr=raw.filter(v=>Number.isFinite(v));if(!el)return;
