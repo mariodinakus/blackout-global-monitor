@@ -1,5 +1,5 @@
 'use strict';
-const {respond}=require('./_shared');
+const {respond}=require('../shared.cjs');
 const DATA_URL='https://catalog.ourworldindata.org/energy/owid_energy/owid_energy.csv';
 function csvLine(line){const out=[];let val='',quoted=false;for(let i=0;i<line.length;i++){const c=line[i];if(c==='"'){if(quoted&&line[i+1]==='"'){val+='"';i++;}else quoted=!quoted;}else if(c===','&&!quoted){out.push(val);val='';}else val+=c;}out.push(val);return out;}
 function parseEnergyCsv(csv){

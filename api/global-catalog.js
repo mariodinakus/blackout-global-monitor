@@ -1,5 +1,5 @@
 'use strict';
-const {respond,finite}=require('./_shared');
+const {respond,finite}=require('../shared.cjs');
 const ROOT='https://worldpowermonitor.com/api/v1';
 async function grab(path,timeout=11000){const r=await fetch(ROOT+path,{headers:{Accept:'application/json'},signal:AbortSignal.timeout(timeout)});if(!r.ok)throw Error('Upstream HTTP '+r.status);return r.json()}
 function entries(a){return Array.isArray(a)?a:[]}

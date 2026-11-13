@@ -221,6 +221,7 @@ const vband = s => { if (s === null) return { label: 'ΑΓΝΩΣΤΟ', tone: 'un
 const settle = async fn => { try { return { ok: true, ...(await fn()) }; } catch (e) { return { ok: false, reason: String(e.message || 'unavailable').slice(0, 80), ...(e.sample ? { sample: e.sample } : {}) }; } };
 
 module.exports = async (req, res) => {
+  if (req?.query?.mode === 'early') return require('../early-signals.cjs')(req, res);
   const t0 = Date.now();
   const mixCodes = Object.keys(COUNTRIES);
   const [eu, gbf, gba, tx, sw, ...mixes] = await Promise.all([

@@ -1,5 +1,5 @@
 'use strict';
-const {respond,finite}=require('./_shared');
+const {respond,finite}=require('../shared.cjs');
 const BASE='https://data.elexon.co.uk/bmrs/api/v1';
 const date=x=>{if(typeof x!=='string')return null;const d=new Date(x.replace(' ','T'));return Number.isFinite(+d)?d.toISOString():null};
 const num=finite;

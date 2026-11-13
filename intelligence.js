@@ -105,7 +105,7 @@ async function country(){
 }
 $('countrySelectIntel').addEventListener('change',country);
 async function refresh(){
- const r=await Promise.allSettled([GET('/api/outages'),GET('/api/pulse'),GET('/api/early-signals')]);
+ const r=await Promise.allSettled([GET('/api/outages'),GET('/api/pulse'),GET('/api/pulse?mode=early')]);
  if(r[0].status==='fulfilled')out=r[0].value;
  if(r[1].status==='fulfilled')pulse=r[1].value;
  if(r[2].status==='fulfilled')early=r[2].value;

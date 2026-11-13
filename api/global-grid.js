@@ -1,5 +1,5 @@
 'use strict';
-const {respond,finite}=require('./_shared');
+const {respond,finite}=require('../shared.cjs');
 const S={
  europe:{name:'EUROPE EUROENERGY',url:'https://euroenergy.live/api/v1/europe/latest',source:'Transmission system operators / EuroEnergy aggregation',cadenceSeconds:60},
  australia:{name:'AUSTRALIA AEMO NEM',url:'https://visualisations.aemo.com.au/aemo/apps/api/report/ELEC_NEM_SUMMARY',source:'Australian Energy Market Operator (AEMO)',cadenceSeconds:300}

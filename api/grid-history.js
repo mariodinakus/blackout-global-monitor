@@ -1,5 +1,5 @@
 'use strict';
-const {respond,finite}=require('./_shared');
+const {respond,finite}=require('../shared.cjs');
 const ROOT='https://worldpowermonitor.com/api/v1';
 const csv=s=>String(s||'').slice(0,90);
 const good=v=>typeof v==='string'&&/^[a-z0-9-]{2,48}$/.test(v);

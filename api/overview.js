@@ -1,5 +1,5 @@
 'use strict';
-const {respond,getJson,list,finite,settledJobs}=require('./_shared');
+const {respond,getJson,list,finite,settledJobs}=require('../shared.cjs');
 const STATUS=[
 {name:'Cloudflare',url:'https://www.cloudflarestatus.com/',api:'https://www.cloudflarestatus.com/api/v2/summary.json'},
 {name:'GitHub',url:'https://www.githubstatus.com/',api:'https://www.githubstatus.com/api/v2/summary.json'},

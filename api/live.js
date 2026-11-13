@@ -1,5 +1,5 @@
 'use strict';
-const {respond,getJson,list,finite,dateOf}=require('./_shared');
+const {respond,getJson,list,finite,dateOf}=require('../shared.cjs');
 const BASE='https://data.elexon.co.uk/bmrs/api/v1';
 const n=val=>finite(val);
 const rows=v=>list(v);
