@@ -19,7 +19,7 @@ const root=[
 ].join('');
 async function json(url){const res=await fetch(url,{cache:'default'});if(!res.ok)throw Error('HTTP '+res.status);return res.json();}
 function svgChart(data,unit='TWh',small=false){
-const pts=data.filter(x=>x&&n(x.value)!==null).slice(-460);if(pts.length===0)return '<div class="ar-unavailable">Η πηγή δεν επέστρεψε παρατηρήσεις για την επιλεγμένη περίοδο. Η απουσία δεδομένων δεν σημαίνει μηδενική παραγωγή.</div>';
+const all=data.filter(x=>x&&n(x.value)!==null);const every=Math.max(1,Math.ceil(all.length/420));const pts=all.filter((x,i)=>i%every===0||i===all.length-1);if(pts.length===0)return '<div class="ar-unavailable">Η πηγή δεν επέστρεψε παρατηρήσεις για την επιλεγμένη περίοδο. Η απουσία δεδομένων δεν σημαίνει μηδενική παραγωγή.</div>';
 let lo=Math.min(...pts.map(x=>n(x.value))),hi=Math.max(...pts.map(x=>n(x.value)));if(hi===lo){lo=Math.max(0,lo-1);hi+=1;}else{const pad=(hi-lo)*.1;lo=Math.max(0,lo-pad);hi+=pad}
 const W=820,H=small?170:275,L=57,R=14,T=20,B=small?28:41;
 const sx=i=>L+i/Math.max(1,pts.length-1)*(W-L-R),sy=v=>T+(hi-v)/(hi-lo)*(H-T-B);
