@@ -14,6 +14,7 @@ const root=[
 '<div class="archive-card ar-status"><div class="ar-card-head"><div><span class="ar-index">02 / REGIONAL LIVE COVERAGE</span><h3>Where the grid is measured</h3></div><span class="ar-pulse">● CHECK EVERY MINUTE</span></div>',
 '<div class="ar-feed" id="ar-feed"><div class="ar-unavailable">Connecting to regional networks…</div></div>',
 '<div class="ar-note"><b>GLOBAL BLACKOUT RISK:</b> Δεν υπάρχει τεκμηριωμένη πιθανότητα για ταυτόχρονη παγκόσμια διακοπή. Παρακολουθούμε ξεχωριστά τεχνικούς δείκτες, επίσημα συμβάντα και διαθεσιμότητα δεδομένων.</div></div></div>',
+'<div class="ar-adequacy"><div><span class="ar-index">04 / VERIFIED REGIONAL ADEQUACY FORECAST</span><h3>British Grid · Loss of Load Probability</h3><p>Επίσημη πρόβλεψη επάρκειας ηλεκτρικού συστήματος ανά περίοδο εκκαθάρισης. Δεν είναι πιθανότητα γενικού ή παγκόσμιου blackout.</p></div><div id="ar-adequacy-data" class="ar-adequacy-data">Αναμονή δεδομένων Elexon…</div></div>',
 '<div class="ar-us"><div class="ar-us-head"><div><span class="ar-index">03 / NORTH AMERICAN GRID HISTORY</span><h3>US grid regions / daily demand</h3></div><select id="ar-usselect"><option>Loading EIA regions…</option></select></div><div class="ar-us-content"><div id="ar-us-chart" class="ar-us-chart"><div class="ar-unavailable">Data loading…</div></div><div class="ar-us-stats"><b id="ar-usvalue">—</b><span id="ar-usdate">Επίσημα ημερήσια στοιχεία από την EIA, όχι μέτρηση ανά λεπτό.</span><a href="https://www.eia.gov/electricity/gridmonitor/" target="_blank" rel="noopener noreferrer">EIA HOURLY GRID MONITOR ↗</a></div></div></div>',
 '<div class="ar-foot"><span>GLOBAL COVERAGE ≠ GLOBAL LIVE TELEMETRY</span><span id="ar-updated">ARCHIVE: LOADING</span><span>EMBER · EIA · ENTSO-E · AEMO · CAIDA</span></div></section>'
 ].join('');
@@ -63,6 +64,15 @@ rows.push({title:'United States',tag:'EIA HISTORICAL',status:'DAILY DATA / 14 GR
 $('ar-feed').innerHTML=rows.map(r=>'<a href="'+safe(r.source)+'" class="ar-feedrow" target="_blank" rel="noopener noreferrer"><div class="ar-feedtop"><span>'+safe(r.tag)+'</span><i class="'+(r.good===true?'fresh':r.good===false?'missing':'historical')+'"></i></div><h4>'+safe(r.title)+'</h4><strong>'+safe(r.status)+'</strong><small>'+safe(r.desc)+'</small></a>').join('');
 $('ar-updated').textContent='LAST SOURCE CHECK '+(grid?.fetchedAt?new Date(grid.fetchedAt).toLocaleTimeString('en-GB',{timeZone:'UTC'}):'—')+' UTC';}
 async function updateGrid(){try{store.grid=await json('/api/global-grid');eventRender();window.dispatchEvent(new CustomEvent('blackout:grid',{detail:store.grid}))}catch{$('ar-feed').innerHTML='<div class="ar-unavailable">Οι ζωντανές διεθνείς πηγές δεν ανταποκρίνονται αυτή τη στιγμή. Τα ιστορικά παραμένουν ανεξάρτητα.</div>'}}
+async function updateAdequacy(){
+const target=$('ar-adequacy-data');if(!target)return;
+try{
+ const d=await json('/api/grid-adequacy');const f=d.latest;
+ if(!d.ok||!f){target.innerHTML='<strong>N/A</strong><span>Δεν δημοσιεύτηκε πρόσφατη έγκυρη πρόβλεψη. Αγνωστος κίνδυνος ≠ μηδέν.</span>';return}
+ const p=n(f.probability),m=n(f.marginMw);
+ target.innerHTML='<strong>'+(p!==null&&p>=0&&p<=1?fmt(p*100,3)+'%':'N/A')+'</strong><div><b>LOLP / '+safe(f.at||'')+'</b><span>Published: '+safe(f.publishedAt||'')+' · forecast horizon '+safe(f.horizon===null?'unknown':f.horizon+' h')+'</span><span>De-rated margin: '+(m===null?'N/A':fmt(m,0)+' MW')+'</span><a href="https://bmrs.elexon.co.uk/api-documentation/endpoint/datasets/LOLPDRM/stream" target="_blank" rel="noopener noreferrer">ELEXON / NESO DATA ↗</a></div>';
+}catch{target.innerHTML='<strong>N/A</strong><span>Η πηγή πρόβλεψης επάρκειας δεν ανταποκρίνεται.</span>';}
+}
 async function updateUS(){const id=store.region;const el=$('ar-us-chart');el.innerHTML='<div class="ar-unavailable">Loading EIA daily history…</div>';
 try{const d=await json('/api/grid-history?kind=us-region&id='+encodeURIComponent(id));if(id!==store.region)return;const data=d.series?.demand||[];el.innerHTML=svgChart(data.slice(-100),'MWh/day',true);$('ar-usvalue').innerHTML=data.length?fmt(data.at(-1).value,0)+' <small>MWh/day</small>':'N/A';$('ar-usdate').textContent=data.length?'Last reported day: '+data.at(-1).at+' · EIA / public domain':'US regional history not available'}
 catch{el.innerHTML='<div class="ar-unavailable">EIA archive unavailable; no estimated values.</div>';}}
@@ -76,7 +86,7 @@ $('ar-country').innerHTML=store.catalog.map(c=>'<option value="'+safe(c.id)+'">'
 $('ar-usselect').innerHTML=store.regions.map(c=>'<option value="'+safe(c.id)+'">'+safe(c.name)+'</option>').join('');$('ar-usselect').value=store.region;
 chooseCountry(store.id);updateUS();
 }else{$('ar-countries').textContent='N/A';$('ar-monthly').textContent='N/A';$('ar-regions').textContent='N/A';$('ar-chart').innerHTML='<div class="ar-unavailable">Global archive unavailable from upstream provider.</div>'}
-updateGrid();setInterval(updateGrid,60000);
+updateGrid();updateAdequacy();setInterval(updateGrid,60000);setInterval(updateAdequacy,120000);
 }
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
 })();
