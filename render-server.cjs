@@ -16,12 +16,12 @@ const HOST = '0.0.0.0';
 const SITE_FILES = new Set([
   '/index.html', '/styles.css', '/app.js', '/live-global.css',
   '/live-global.js', '/global-coverage.css', '/global-coverage.js',
-  '/planet.js', '/favicon.ico', '/robots.txt'
+  '/planet.js', '/pulse-ui.css', '/pulse-ui.js', '/map-ui.css', '/map-ui.js', '/favicon.ico', '/robots.txt'
 ]);
 const API_HANDLERS = new Set([
   'overview', 'energy', 'news', 'cyber',
   'live', 'world-energy', 'global-grid',
-  'global-catalog', 'grid-history', 'grid-adequacy'
+  'global-catalog', 'grid-history', 'grid-adequacy', 'pulse', 'outages'
 ]);
 
 const TYPES = {
