@@ -43,3 +43,14 @@
 .ar-foot{border-top:1px solid #ccd0c2;background:#d7e6c9;display:flex;justify-content:space-between;gap:16px;padding:15px 24px;color:#536450;font:9px "DM Mono",monospace;flex-wrap:wrap}
 @media(max-width:1140px){.archive-grid{grid-template-columns:1fr}.archive-card{border-right:0;border-bottom:1px solid #b9bcb1}.archive-card:last-child{border:0}.ar-feed{grid-template-columns:repeat(3,1fr);max-height:500px}}
 @media(max-width:680px){.archive-head{padding:22px;display:block}.archive-symbol{font-size:43px;margin-top:17px}.archive-kpis{grid-template-columns:repeat(2,1fr)}.archive-kpis>div:nth-child(2){border-right:0}.archive-kpis>div:nth-child(-n+2){border-bottom:1px solid #a5b5ab}.archive-kpis>div{padding:16px}.archive-card{padding:16px}.archive-grid{display:block}.ar-feed{grid-template-columns:1fr 1fr;gap:7px}.ar-us{padding:17px}.ar-us-head{align-items:stretch;display:block}.ar-us-head select{width:100%;margin-top:13px}.ar-us-content{grid-template-columns:1fr}.ar-us-stats{min-height:90px}.ar-card-head h3{font-size:20px}.ar-chart-header{display:block}.ar-latest{text-align:left;margin-top:9px}.ar-chart{height:230px}.ar-fuel-item{grid-template-columns:72px 1fr 65px}.ar-feedrow{padding:10px}.ar-feedrow h4{font-size:12px}.ar-feedrow strong{font-size:10px}}
+
+.ar-adequacy{display:grid;grid-template-columns:minmax(220px,1fr) minmax(245px,1fr);align-items:center;gap:18px;background:#e9dffc;border-top:1px solid #a7a0ca;padding:25px}
+.ar-adequacy h3{font:800 24px "Space Grotesk",sans-serif;letter-spacing:-.04em;margin:7px 0;color:#312b55}
+.ar-adequacy p{font:12px/1.7 "DM Sans",sans-serif;color:#5b5275;margin:8px 0 0}
+.ar-adequacy-data{min-height:94px;display:flex;gap:20px;align-items:center;background:#281d47;color:#f7f2ff;border-radius:10px;padding:18px}
+.ar-adequacy-data strong{font:800 30px "Space Grotesk",sans-serif;color:#cbf5a1;letter-spacing:-.06em}
+.ar-adequacy-data div{display:flex;flex-direction:column;gap:6px}
+.ar-adequacy-data span{font:10px/1.6 "DM Mono",monospace;color:#c8c0da}
+.ar-adequacy-data b{font:10px "DM Mono",monospace;color:#e6dfff}
+.ar-adequacy-data a{font:10px "DM Mono",monospace;color:#b9f0cf;text-decoration:underline}
+@media(max-width:680px){.ar-adequacy{grid-template-columns:1fr;padding:17px}.ar-adequacy-data{flex-wrap:wrap}}
