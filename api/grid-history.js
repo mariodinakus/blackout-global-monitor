@@ -21,7 +21,7 @@ async function realtime(country,hours){
  const params=new URLSearchParams({country,start:start.toISOString(),end:end.toISOString()});
  const r=await get('https://api.energy-charts.info/v2/public_power?'+params);
  if(!Array.isArray(r?.data))throw Error('No time series data');
- const exclude=/share|percentage|forecast|price|demand|carbon|co2|import|export/i;
+ const exclude=/share|percentage|forecast|price|demand|carbon|co2|import|export|load|total|net_|balance|consumption/i;
  const series=r.data.map(row=>{const vals=row?.values||{};const sources=Object.entries(vals).filter(([k,v])=>!exclude.test(k)&&n(v)!==null&&n(v)>0);return{at:row.timestamp,mw:sources.length?sources.reduce((sum,[,v])=>sum+n(v),0):null,values:Object.fromEntries(sources.slice(0,25))}}).filter(x=>Number.isFinite(Date.parse(x.at))&&x.mw!==null).slice(-1500);
  return{ok:series.length>0,scope:'recent-country',country,hours,unit:'MW (generation aggregate, subject to per-fuel source definitions)',series,source:'Fraunhofer ISE Energy-Charts',sourceUrl:'https://api.energy-charts.info/',licence:'CC BY 4.0',cadenceMinutes:n(r.interval_minutes),note:'Recent generation records only. Not overall demand, line loading, outages or full national grid health.'};
 }
