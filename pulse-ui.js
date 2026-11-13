@@ -55,7 +55,7 @@
     if (ce) out.push({ k: 'Ευρώπη · απόσταση από αποκοπή φορτίου', v: fmt(ce.marginToLoadSheddingMHz) + ' mHz', s: `${fmt(ce.latestHz, 3)} Hz τώρα · όριο 49,000 Hz`, m: (1 - Math.min(1, ce.marginToLoadSheddingMHz / 1000)) * 100 });
     const ib = d.iberia2025;
     const ex = d.mostExposed;
-    if (ex && ex.name !== 'Ισπανία') out.push({ k: 'Πιο εκτεθειμένη χώρα τώρα · ηλιακά+αιολικά', v: fmt(ex.share, 0) + '%', s: `${ex.name} · δεδομένα ${tAth(ex.at)}`, m: ex.share, ref: ib?.ibrShareApprox });
+    if (ex && ex.name !== 'Ισπανία') out.push({ k: 'Υψηλότερο μερίδιο ηλιακών+αιολικών', v: fmt(ex.share, 0) + '%', s: `${ex.name} · δεδομένα ${tAth(ex.at)}`, m: ex.share, ref: ib?.ibrShareApprox });
     if (ib?.current !== null && ib?.current !== undefined) out.push({ k: 'Ισπανία · ηλιακά+αιολικά vs 28/4/2025', v: fmt(ib.current, 1) + '%', s: `τη μέρα του blackout ≈${ib.ibrShareApprox}%`, m: ib.current, ref: ib.ibrShareApprox });
     const gb = d.gbAdequacy;
     if (gb) out.push({ k: 'Βρετανία · ελάχιστο περιθώριο 12 ωρών', v: fmt(gb.minMarginMw) + ' MW', s: 'κρίσιμο κάτω από ~500 MW', m: Math.max(0, Math.min(100, (5000 - gb.minMarginMw) / 45)) });
@@ -69,11 +69,11 @@
   function summary(d) {
     const h = d.headline, ce = d.frequency?.ce, es = d.iberia2025;
     if (h.score === null) return 'Οι πηγές δεν απαντούν αυτή τη στιγμή. Αυτό σημαίνει «άγνωστο», όχι «ασφαλές».';
-    const calm = h.score < 20 ? 'Κανένα από τα δίκτυα που παρακολουθούμε δεν δείχνει σημάδια επικείμενης κατάρρευσης.' : h.score < 40 ? 'Υπάρχει αυξημένη πίεση σε ένα σύστημα, αλλά μέσα στα κανονικά λειτουργικά όρια.' : 'Ένα σύστημα λειτουργεί υπό αισθητή πίεση — αξίζει να το παρακολουθείς.';
+    const calm = h.score < 20 ? 'Οι διαθέσιμες μετρήσεις παρουσιάζουν χαμηλή βαθμολογία πίεσης. Η κάλυψη είναι μερική.' : h.score < 40 ? 'Υπάρχει αυξημένη πίεση σε ένα σύστημα, αλλά μέσα στα κανονικά λειτουργικά όρια.' : 'Μία διαθέσιμη μέτρηση έχει αυξημένη βαθμολογία· χρειάζεται έλεγχος στην πηγή.';
     let s = calm + ` Το πιο πιεσμένο αυτή τη στιγμή: <b>${esc(h.system)}</b> (${h.score}/100).`;
     if (ce) s += ` Η ευρωπαϊκή συχνότητα είναι ${fmt(ce.latestHz, 3)} Hz — ${Math.abs(ce.deviationMHz) <= 50 ? 'μέσα στη ζώνη ±50 mHz' : 'εκτός της κανονικής ζώνης ±50 mHz'}.`;
     if (es?.current != null) s += ` Η Ισπανία τρέχει με ${fmt(es.current, 0)}% ηλιακά+αιολικά (≈${es.ibrShareApprox}% την ημέρα του blackout).`;
-    if (d.mostExposed && d.mostExposed.share >= (es?.ibrShareApprox ?? 70)) s += ` Πιο εκτεθειμένη δομικά: <b>${esc(d.mostExposed.name)}</b> με ${fmt(d.mostExposed.share, 0)}% — πάνω από το επίπεδο της Ισπανίας τότε.`;
+    if (d.mostExposed && d.mostExposed.share >= (es?.ibrShareApprox ?? 70)) s += ` Μεγαλύτερο μερίδιο ηλιακών και αιολικών: <b>${esc(d.mostExposed.name)}</b> με ${fmt(d.mostExposed.share, 0)}% (δεν αποτελεί μέτρο κινδύνου).`;
     return s;
   }
 
@@ -92,8 +92,8 @@
     const ref = d.iberia2025?.ibrShareApprox ?? 70;
     const mix = [...(d.mix || [])].sort((a, b) => b.ibrShare - a.ibrShare);
     $('ibr').innerHTML = mix.length ? mix.map(m => `<div class="ibr-row"><span class="name">${esc(m.name)}</span>
-      <div class="ibr-bar" title="Μέγιστο 24h: ${m.peak24.share}% στις ${tAth(m.peak24.at)}"><span class="now bg-${toneOf(m.ibrScore)}" style="width:${Math.min(100, m.ibrShare)}%"></span><span class="peak" style="left:${Math.min(99, m.peak24.share)}%"></span><span class="ref" style="left:${ref}%"></span></div>
-      <span class="val">${fmt(m.ibrShare, 0)}%</span></div>`).join('') + `<div class="chart-foot">Τελευταία δεδομένα χωρών: ${tAth(mix[0].at)} (${ago(mix[0].at)}) · Energy-Charts δημοσιεύει με καθυστέρηση 15–60′</div>` : '<div class="empty">Τα δεδομένα παραγωγής δεν είναι διαθέσιμα.</div>';
+      <div class="ibr-bar" title="Μέγιστο 24h: ${m.peak24.share}% στις ${tAth(m.peak24.at)}"><span class="now bg-unknown" style="width:${Math.min(100, m.ibrShare)}%"></span><span class="peak" style="left:${Math.min(99, m.peak24.share)}%"></span><span class="ref" style="left:${ref}%"></span></div>
+      <span class="val">${fmt(m.ibrShare, 0)}%</span></div>`).join('') + `<div class="chart-foot">Τελευταία δεδομένα χωρών: ${tAth(mix[0].at)} (${ago(mix[0].at)}) · η καθυστέρηση διαφέρει ανά χώρα</div>` : '<div class="empty">Τα δεδομένα παραγωγής δεν είναι διαθέσιμα.</div>';
   }
 
   /* ---------- outages ---------- */
@@ -104,7 +104,7 @@
       const d = await r.json();
       const net = d.internet || {}, ongoing = (net.countries || []).filter(c => c.ongoing);
       const stats = [
-        [net.ongoing ?? '—', 'χώρες με ενεργή διακοπή Internet', ongoing.length ? 'severe' : 'calm'],
+        [net.ongoing ?? '—', 'χώρες με σήμα διαταραχής Internet', ongoing.length ? 'severe' : 'calm'],
         [(net.countries || []).length || (net.ongoing === null ? '—' : 0), 'χώρες με διακοπή στο 24ωρο', 'watch'],
         [d.providersDown, 'πλατφόρμες με σοβαρό πρόβλημα', d.providersDown ? 'severe' : 'calm'],
         [d.news?.length ?? 0, 'αναφορές διακοπών ρεύματος 24h', 'unknown']

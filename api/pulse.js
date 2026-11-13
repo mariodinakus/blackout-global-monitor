@@ -116,6 +116,7 @@ async function gbAdequacy() {
   const marginScore = Number.isFinite(minMargin) ? clamp(((5000 - minMargin) / 4500) * 100) : null;
   const lolpScore = maxLolp > 0 ? clamp(((Math.log10(maxLolp) + 4) / 3) * 100) : 0; // 1e-4 → 0, 0.1 → 100
   return {
+    publishedAt: fc.map(r => r.pub).filter(Boolean).sort().at(-1) || null,
     minMarginMw: Number.isFinite(minMargin) ? Math.round(minMargin) : null, maxLolp, nowMarginMw: fc[0].margin,
     forecast: fc.slice(0, 24).map(r => [r.at, r.margin, r.lolp]),
     score: round(Math.max(marginScore ?? 0, lolpScore), 0),
@@ -227,7 +228,12 @@ module.exports = async (req, res) => {
     settle(euFrequency), settle(gbFrequency), settle(gbAdequacy), settle(ercot), settle(space),
     ...mixCodes.map(cc => settle(() => cachedMix(cc)))
   ]);
-  const euF = eu.ok ? eu.stats.score : null;
+  const fresh = (at, limit) => !!at && Date.now() - Date.parse(at) >= -60000 && Date.now() - Date.parse(at) <= limit;
+  const euF = eu.ok && fresh(eu.stats.at, 5 * 60000) ? eu.stats.score : null;
+  if (gbf.ok && !fresh(gbf.stats.at, 5 * 60000)) gbf.ok = false;
+  if (gba.ok && !fresh(gba.publishedAt, 4 * 3600000)) gba.ok = false;
+  if (tx.ok && !fresh(tx.at, 15 * 60000)) tx.ok = false;
+  if (sw.ok && !fresh(sw.at, 60 * 60000)) sw.ok = false;
 
   const systems = [];
   systems.push({
@@ -238,7 +244,7 @@ module.exports = async (req, res) => {
   for (const m of mixes) {
     if (!m.ok) continue;
     systems.push({
-      id: m.code, kind: 'structural', name: m.name, sub: 'Ευαλωτότητα τύπου Ισπανίας · δομικός δείκτης', score: m.ibrScore,
+      id: m.code, kind: 'structural', name: m.name, sub: 'Μερίδιο παραγωγής από ήλιο και άνεμο · όχι κίνδυνος blackout', score: m.ibrScore,
       components: [{ k: 'Ηλιακά + αιολικά (inverter-based)', v: m.ibrShare + '%', s: m.ibrScore }, { k: 'Μέγιστο 24 ωρών', v: m.peak24.share + '%' }, { k: 'Φορτίο', v: m.loadMw ? m.loadMw.toLocaleString('el-GR') + ' MW' : '—' }],
       at: m.at, source: 'Energy-Charts · public power', sourceUrl: 'https://www.energy-charts.info/', ok: true
     });
@@ -248,14 +254,14 @@ module.exports = async (req, res) => {
     systems.push({
       id: 'gb', name: 'Μεγάλη Βρετανία', sub: 'Ανεξάρτητο δίκτυο NESO', score: round(Math.max(...parts) * 0.6 + (parts.reduce((a, b) => a + b, 0) / parts.length) * 0.4, 0),
       components: [gbf.ok && { k: 'Απόκλιση συχνότητας', v: gbf.stats.deviationMHz + ' mHz', s: gbf.stats.score }, gba.ok && { k: 'Ελάχιστο περιθώριο 12h (derated)', v: gba.minMarginMw?.toLocaleString('el-GR') + ' MW', s: gba.score }, gba.ok && { k: 'Μέγ. πιθανότητα απώλειας φορτίου (LoLP)', v: gba.maxLolp ? gba.maxLolp.toExponential(1) : '≈0' }].filter(Boolean),
-      at: gbf.ok ? gbf.stats.at : null, source: 'Elexon / NESO', sourceUrl: 'https://bmrs.elexon.co.uk/', ok: true
+      at: gbf.ok ? gbf.stats.at : gba.publishedAt, source: 'Elexon / NESO', sourceUrl: 'https://bmrs.elexon.co.uk/', ok: true
     });
   }
   if (tx.ok) systems.push({ id: 'tx', name: 'Τέξας (ERCOT)', sub: 'Απομονωμένο δίκτυο ΗΠΑ', score: tx.score, components: [{ k: 'Άμεσα διαθέσιμη εφεδρεία (PRC)', v: tx.prcMw.toLocaleString('el-GR') + ' MW', s: tx.score }, { k: 'Κατώφλι EEA1 / κυλιόμενες διακοπές', v: '2.500 / 1.500 MW' }], at: tx.at, source: tx.source, sourceUrl: tx.sourceUrl, ok: true });
   if (sw.ok) systems.push({ id: 'sw', name: 'Διαστημικός καιρός', sub: 'Γεωμαγνητική καταιγίδα · παγκόσμιος παράγοντας', score: sw.score, components: [{ k: 'Δείκτης Kp (τώρα)', v: String(sw.kp), s: sw.score }, { k: 'Κλίμακα G τώρα / πρόγνωση', v: 'G' + sw.gNow + ' / G' + sw.gForecastMax }], at: sw.at, source: sw.source, sourceUrl: sw.sourceUrl, ok: true });
 
-  systems.forEach(s => { if (!s.kind) s.kind = 'live'; Object.assign(s, s.kind === 'structural' ? vband(s.score) : band(s.score)); });
-  const scored = systems.filter(s => s.score !== null && s.kind === 'live');
+  systems.forEach(s => { if (!s.kind) s.kind = 'live'; Object.assign(s, s.kind === 'structural' ? {label:'ΜΕΡΙΔΙΟ ΠΑΡΑΓΩΓΗΣ',tone:'unknown'} : band(s.score)); });
+  const scored = systems.filter(s => s.score !== null && s.kind === 'live' && s.id !== 'sw');
   const mostExposed = mixes.filter(m => m.ok).sort((a, b) => b.ibrShare - a.ibrShare)[0] || null;
   const worst = scored.reduce((m, s) => (s.score > (m?.score ?? -1) ? s : m), null);
   const headline = worst ? { score: worst.score, system: worst.name, ...band(worst.score) } : { score: null, ...band(null) };
@@ -266,7 +272,7 @@ module.exports = async (req, res) => {
     headline, systems, mostExposed: mostExposed ? { name: mostExposed.name, share: mostExposed.ibrShare, at: mostExposed.at } : null,
     frequency: { ce: eu.ok ? { ...eu.stats, series: eu.series, source: eu.source, sourceUrl: eu.sourceUrl } : null, gb: gbf.ok ? { ...gbf.stats, series: gbf.series, source: gbf.source, sourceUrl: gbf.sourceUrl } : null },
     mix: mixes.filter(m => m.ok),
-    iberia2025: { date: '2025-04-28T10:33:00Z', ibrShareApprox: 70, note: 'Περίπου 59% φωτοβολταϊκά + 12% αιολικά τη στιγμή της κατάρρευσης (ENTSO-E). Αιτία: αλυσιδωτή υπέρταση, όχι συχνότητα.', current: es ? es.ibrShare : null },
+    iberia2025: { date: '2025-04-28T10:33:00Z', ibrShareApprox: 70, note: 'Περίπου 59% φωτοβολταϊκά + 12% αιολικά τη στιγμή της κατάρρευσης (ENTSO-E). Η αναλογία είναι ιστορική σύγκριση και δεν αποδεικνύει κίνδυνο.', current: es ? es.ibrShare : null },
     gbAdequacy: gba.ok ? gba : null, ercot: tx.ok ? tx : null, space: sw.ok ? sw : null,
     feeds: { euFrequency: eu.ok, gbFrequency: gbf.ok, gbAdequacy: gba.ok, ercot: tx.ok, space: sw.ok, mix: Object.fromEntries(mixes.map((m, i) => [mixCodes[i], m.ok])) },
     ...(req.query && req.query.debug ? { debug: { eu, gbf: { ok: gbf.ok, reason: gbf.reason }, gba: { ok: gba.ok, reason: gba.reason }, tx, sw: { ok: sw.ok, reason: sw.reason }, mixes: mixes.map(m => ({ ok: m.ok, reason: m.reason })) } } : {}),

@@ -10,6 +10,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/pulse-ui.css">
 <link rel="stylesheet" href="/map-ui.css">
+<link rel="stylesheet" href="/radar.css">
 </head>
 <body>
 <header class="top">
@@ -25,17 +26,19 @@
 <main class="wrap">
   <section class="hero">
     <div class="hero-gauge card">
-      <div class="eyebrow">Δείκτης εγγύτητας σε blackout · 0–100</div>
+      <div class="eyebrow">Ευρετικός δείκτης μετρούμενης πίεσης · 0–100</div>
       <svg id="gauge" viewBox="0 0 320 190" role="img" aria-label="Δείκτης"></svg>
       <div class="gauge-label"><span class="band" id="band">—</span></div>
       <p class="gauge-sub" id="worst">Φόρτωση ζωντανών μετρήσεων…</p>
     </div>
     <div class="hero-text">
-      <h1>Πόσο κοντά είμαστε<br>σε ένα <em>blackout</em>;</h1>
+      <h1>Τι συμβαίνει στα<br><em>δίκτυα τώρα;</em></h1>
       <p class="lede" id="summary">Συλλέγουμε ζωντανές μετρήσεις από διαχειριστές δικτύων και αισθητήρες. Κάθε λεπτό.</p>
       <div class="distances" id="distances"></div>
     </div>
   </section>
+
+  <section class="radar" id="radar"><div class="radar-head"><div><div class="eyebrow">LIVE INFRASTRUCTURE RADAR</div><h2>Η εικόνα τώρα</h2><p>Ρεύμα και ψηφιακές υπηρεσίες σε ξεχωριστά σήματα. Οι διαθέσιμες μετρήσεις δεν προβλέπουν blackout.</p></div><button class="btn" id="enableAlerts" type="button">Ενεργοποίηση ειδοποιήσεων</button></div><div class="radar-controls" id="regionFilter"><button class="chip on" data-region="world">Κόσμος</button><button class="chip" data-region="europe">Ευρώπη</button><button class="chip" data-region="americas">Αμερική</button><button class="chip" data-region="asia">Ασία</button><button class="chip" data-region="africa">Αφρική</button><button class="chip" data-region="oceania">Ωκεανία</button></div><div class="radar-grid" id="radarGrid"><div class="empty">Συλλογή δεδομένων…</div></div><div class="radar-incidents"><div><div class="eyebrow">MAJOR INCIDENT RADAR</div><h3>Μεγάλα ψηφιακά περιστατικά</h3><p>Επίσημες αναφορές παρόχων · η αιτία και η γεωγραφική έκταση δεν υποτίθενται.</p><div id="majorIncidents">Φόρτωση…</div></div><div><div class="eyebrow">TIMELINE</div><h3>Τι άλλαξε</h3><p>Καταγραφή σε αυτή τη συσκευή, όσο η σελίδα είναι ανοιχτή.</p><div id="radarTimeline">Η καταγραφή ξεκινά τώρα.</div></div></div><p class="radar-note" id="radarFresh"></p></section>
 
   <section class="block">
     <div class="block-head">
@@ -49,14 +52,14 @@
       </div>
       <div id="map"></div>
       <div class="map-info" id="mapInfo">Πάτα σε μια κουκκίδα ή σε ένα ποσοστό για λεπτομέρειες.</div>
-      <div class="ibr-legend"><span><i class="lg bg-severe"></i>Ενεργή διακοπή Internet</span><span><i class="lg bg-watch"></i>Έληξε στο 24ωρο</span><span><i class="lg sq bg-calm"></i>% ηλιακά+αιολικά (χρώμα = ευαλωτότητα)</span><span><i class="lg ring"></i>Δίκτυο με ζωντανό δείκτη</span></div>
+      <div class="ibr-legend"><span><i class="lg bg-severe"></i>Ενεργή διακοπή Internet</span><span><i class="lg bg-watch"></i>Έληξε στο 24ωρο</span><span><i class="lg sq bg-calm"></i>% ηλιακά+αιολικά (μερίδιο παραγωγής)</span><span><i class="lg ring"></i>Δίκτυο με ζωντανό δείκτη</span></div>
     </div>
   </section>
 
   <section class="block">
     <div class="block-head">
       <div><div class="eyebrow">02 · Outages τώρα</div><h2>Τι είναι πεσμένο αυτή τη στιγμή</h2></div>
-      <p class="note" id="outNote">Διακοπές Internet ανά χώρα (συχνά το πρώτο ίχνος διακοπής ρεύματος), επίσημες σελίδες κατάστασης cloud και αναφορές ειδήσεων 24 ωρών.</p>
+      <p class="note" id="outNote">Σήματα διαταραχής Internet ανά χώρα (δεν τεκμηριώνουν διακοπή ρεύματος), επίσημες σελίδες κατάστασης cloud και αναφορές ειδήσεων 24 ωρών.</p>
     </div>
     <div class="out-stats" id="outStats"></div>
     <div class="out-grid">
@@ -99,8 +102,8 @@
 
   <section class="block">
     <div class="block-head">
-      <div><div class="eyebrow">06 · Τύπου Ισπανίας</div><h2>Πόσο κοντά στις συνθήκες της 28/4/2025;</h2></div>
-      <p class="note">Τη στιγμή της κατάρρευσης η Ισπανία είχε ≈70% ηλιακά+αιολικά — λίγη «αδράνεια» και λίγο έλεγχο τάσης. Δεν είναι προφητεία, είναι ευαλωτότητα.</p>
+      <div><div class="eyebrow">06 · Ενεργειακό μίγμα</div><h2>Μερίδιο ηλιακής και αιολικής παραγωγής</h2></div>
+      <p class="note">Ποσοστό εγχώριας παραγωγής από ήλιο και άνεμο. Δεν μετρά ευαλωτότητα, αδράνεια ή πιθανότητα blackout. Τα δεδομένα μπορεί να καθυστερούν.</p>
     </div>
     <div class="card"><div class="ibr" id="ibr"></div><div class="ibr-legend"><span><i class="sw now"></i>Τώρα</span><span><i class="sw peak"></i>Μέγιστο 24h</span><span><i class="sw ref"></i>Ισπανία 28/4/2025 ≈70%</span></div></div>
   </section>
@@ -129,7 +132,7 @@
     <div class="eyebrow">09 · Μέθοδος & όρια</div><h2>Πώς υπολογίζεται — και τι δεν ξέρουμε</h2>
     <div class="method-grid">
       <div class="card"><h3>Συχνότητα</h3><p>Ευρώπη: 20 στα ±50 mHz, 70 στα ±200 mHz (συναγερμός), 100 στα ±1 Hz (αποκοπή φορτίου). Βρετανία: 20 / 70 / 100 στα ±0,2 / ±0,5 / ±1,2 Hz. Βάρος 65% η τρέχουσα τιμή, 35% η χειρότερη του παραθύρου.</p></div>
-      <div class="card"><h3>Ηλιακά + αιολικά</h3><p>Δομικός δείκτης ευαλωτότητας, όχι ζωντανή πίεση: 0 στο 40%, 100 στο 90%. Δεν μπαίνει στον κεντρικό δείκτη. Η Ισπανία έπεσε από υπέρταση — η τάση δεν δημοσιεύεται ζωντανά.</p></div>
+      <div class="card"><h3>Ηλιακά + αιολικά</h3><p>Μερίδιο της εγχώριας παραγωγής, όχι μέτρηση της ευστάθειας ή της ευαλωτότητας του δικτύου. Δεν συμμετέχει στον κεντρικό δείκτη.</p></div>
       <div class="card"><h3>Επάρκεια & εφεδρείες</h3><p>Βρετανία: ελάχιστο derated margin 12 ωρών (100 κάτω από 500 MW) και LoLP της NESO. Τέξας: PRC — EEA1 κάτω από 2.500 MW, κυλιόμενες διακοπές κάτω από 1.500 MW.</p></div>
       <div class="card"><h3>Διαστημικός καιρός & outages</h3><p>Kp της NOAA: 0 μέχρι Kp 3, 100 στο Kp 9 (G5). Τα outages (IODA, status pages, ειδήσεις) εμφανίζονται χωριστά και δεν αλλάζουν τον δείκτη δικτύων.</p></div>
     </div>
@@ -141,5 +144,6 @@
 <script src="https://cdn.jsdelivr.net/npm/globe.gl@2.45.3/dist/globe.gl.min.js" integrity="sha384-UIZDw6UdEIau7arIrg1Ug9IeMaLlfIHHF6awQRUsvId92iYakt5KLbHNEDQJF5QP" crossorigin="anonymous" defer></script>
 <script src="/pulse-ui.js" defer></script>
 <script src="/map-ui.js" defer></script>
+<script src="/radar.js" defer></script>
 </body>
 </html>

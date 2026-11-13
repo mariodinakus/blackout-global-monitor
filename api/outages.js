@@ -65,7 +65,7 @@ async function azure() {
   const x = await get('https://azure.status.microsoft/en-us/status/feed/', 8000, 'text');
   const items = [...x.matchAll(/<item>([\s\S]*?)<\/item>/g)].map(m => ({ name: (m[1].match(/<title>(?:<!\[CDATA\[)?([\s\S]*?)(?:\]\]>)?<\/title>/) || [])[1] || '', at: (m[1].match(/<pubDate>([\s\S]*?)<\/pubDate>/) || [])[1] || null }))
     .filter(i => i.at && Date.now() - Date.parse(i.at) < 24 * 3600e3).slice(0, 4);
-  return { name: 'Microsoft Azure', url: 'https://azure.status.microsoft/', indicator: items.length ? 'major' : 'none', description: items.length ? 'Ανακοινώσεις τελευταίων 24h' : 'Καμία ανακοίνωση 24h', incidents: items.map(i => ({ name: i.name.trim().slice(0, 160), status: 'reported', at: new Date(i.at).toISOString() })) };
+  return { name: 'Microsoft Azure', url: 'https://azure.status.microsoft/', indicator: 'unknown', description: items.length ? 'Ανακοινώσεις τελευταίων 24h · ενεργή κατάσταση άγνωστη' : 'Καμία ανακοίνωση 24h · ενεργή κατάσταση άγνωστη', incidents: items.map(i => ({ name: i.name.trim().slice(0, 160), status: 'reported', at: new Date(i.at).toISOString() })) };
 }
 async function aws() {
   // AWS publishes this file as UTF-16; decode by BOM
@@ -75,7 +75,7 @@ async function aws() {
   const enc = buf[0] === 0xfe && buf[1] === 0xff ? 'utf-16be' : buf[0] === 0xff && buf[1] === 0xfe ? 'utf-16le' : 'utf-8';
   const d = JSON.parse(new TextDecoder(enc).decode(buf).replace(/^\uFEFF/, '') || '[]');
   const open = (Array.isArray(d) ? d : []).slice(0, 4);
-  return { name: 'Amazon Web Services', url: 'https://health.aws.amazon.com/health/status', indicator: open.length ? 'major' : 'none', description: open.length ? `${open.length} ενεργά περιστατικά` : 'No open events', incidents: open.map(i => ({ name: String((i.service_name || '') + (i.region_name ? ' · ' + i.region_name : '') + ': ' + (i.summary || '')).slice(0, 160), status: 'ongoing', at: num(i.date) ? new Date(num(i.date) * 1000).toISOString() : null })) };
+  return { name: 'Amazon Web Services', url: 'https://health.aws.amazon.com/health/status', indicator: open.length ? 'unknown' : 'none', description: open.length ? `${open.length} αναφορές AWS · σοβαρότητα μη καθορισμένη` : 'No open events', incidents: open.map(i => ({ name: String((i.service_name || '') + (i.region_name ? ' · ' + i.region_name : '') + ': ' + (i.summary || '')).slice(0, 160), status: 'reported', at: num(i.date) ? new Date(num(i.date) * 1000).toISOString() : null })) };
 }
 async function slack() {
   const d = await get('https://slack-status.com/api/v2.0.0/current', 7000);

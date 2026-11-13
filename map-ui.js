@@ -53,14 +53,14 @@
     for (const c of out?.internet?.countries || []) {
       const p = C[c.code]; if (!p) continue;
       net.push({ lat: p[0], lng: p[1], ongoing: c.ongoing, color: c.ongoing ? COLORS.severe : COLORS.watch, title: c.country,
-        html: `<b>${esc(c.country)}</b> · ${c.ongoing ? 'ενεργή διακοπή Internet' : 'διακοπή Internet που έληξε'} · από ${tAth(c.startedAt)}${c.endedAt ? ' έως ' + tAth(c.endedAt) : ''} · αισθητήρες: ${esc(c.sensors.join(', '))} <span class="muted">· IODA · δεν σημαίνει απαραίτητα διακοπή ρεύματος</span>` });
+        html: `<b>${esc(c.country)}</b> · ${c.ongoing ? 'σήμα πιθανής διαταραχής Internet' : 'σήμα Internet που έληξε'} · από ${tAth(c.startedAt)}${c.endedAt ? ' έως ' + tAth(c.endedAt) : ''} · αισθητήρες: ${esc(c.sensors.join(', '))} <span class="muted">· IODA · δεν σημαίνει απαραίτητα διακοπή ρεύματος</span>` });
     }
     for (const s of pulse?.systems || []) {
       if (s.kind === 'structural') {
         const p = C[String(s.id).toUpperCase()]; if (!p) continue;
         const share = s.components[0]?.v || '';
-        mix.push({ kind: 'mix', lat: p[0], lng: p[1], color: COLORS[s.tone] || COLORS.unknown, text: parseFloat(share).toFixed(0) + '%', title: s.name,
-          html: `<b>${esc(s.name)}</b> · ηλιακά + αιολικά τώρα ${esc(share)} · μέγιστο 24h ${esc(s.components[1]?.v)} · φορτίο ${esc(s.components[2]?.v)} · ${esc(s.label)} <span class="muted">· δεδομένα ${tAth(s.at)} · Energy-Charts · Ισπανία 28/4/2025 ≈70%</span>` });
+        mix.push({ kind: 'mix', lat: p[0], lng: p[1], color: '#64748b', text: parseFloat(share).toFixed(0) + '%', title: s.name,
+          html: `<b>${esc(s.name)}</b> · ηλιακά + αιολικά τώρα ${esc(share)} · μέγιστο 24h ${esc(s.components[1]?.v)} · φορτίο ${esc(s.components[2]?.v)} <span class="muted">· δεν είναι δείκτης κινδύνου · δεδομένα ${tAth(s.at)} · Energy-Charts · Ισπανία 28/4/2025 ≈70%</span>` });
       } else if (GRID[s.id]) {
         grid.push({ kind: 'grid', lat: GRID[s.id][0], lng: GRID[s.id][1], color: COLORS[s.tone] || COLORS.unknown, text: String(s.score ?? '—'), title: s.name,
           html: `<b>${esc(s.name)}</b> · ${s.score ?? '—'}/100 · ${esc(s.label)} · ${s.components.map(c => esc(c.k) + ' ' + esc(c.v)).join(' · ')} <span class="muted">· μέτρηση ${tAth(s.at)} · ${esc(s.source)}</span>` });
