@@ -1,0 +1,33 @@
+/* BLACKOUT / graphite + electric cyan. One coherent dark palette. */
+:root,:root:not([data-theme="light"]){
+--bg:#090b10;--surface:#141820;--ink:#f1f3f6;--ink2:#b5bfcb;--muted:#84909f;--line:#292f39;--accent:#67d6e8;--track:#242b35;--shadow:0 6px 28px rgba(0,0,0,.14);--focus-bg:#090b10;--focus-panel:#141820;--focus-border:#292f39;
+--calm:#50c5a6;--watch:#e7b76a;--stress:#e99169;--severe:#ee777d;--edge:#ff8d95;--unknown:#8b97a6;
+}
+html{color-scheme:dark}body{background:#090b10;color:var(--ink)}
+.top{background:rgba(9,11,16,.94);border-color:var(--line)}
+.brand-mark{background:radial-gradient(circle at 35% 35%,#090b10 0 30%,#67d6e8 31%)}
+.card,.dist,.intel-pane,.intel-row,.intel-stat,.intel-nav,.intel-selector,.intel-tag,.map-info,.live,.btn{background:#141820;color:var(--ink);border-color:#292f39}
+h1 em{color:#67d6e8}
+.continent-nav{background:linear-gradient(180deg,#090b10f8,#090b10ed)}
+.continent-nav button{background:#171c25;color:#aab7c6;border-color:#303844;transition:background .2s,border-color .2s}
+.continent-nav button.active,.continent-nav button:hover{background:#23353d;color:#e7fbff;border-color:#67d6e8}
+.fold{background:#11151d;border-color:#292f39}
+.fold>summary{color:#e4eaf0}
+.fold>summary:after{color:#67d6e8}
+.coverage,.infra,.replay,.nerve,.health{color:#f1f3f6!important}
+.coverage-country,.coverage-stat,.coverage-detail,.infra-card,.region-card,.replay-stats>div{background:#191f29!important;border-color:#303946!important;color:#e9eef5!important}
+.coverage-country:hover,.coverage-country[aria-pressed=true]{background:#23343d!important;border-color:#67d6e8!important}
+.coverage input,.coverage select,.infra input,.infra select,.replay button,.region-card button{background:#202934!important;border-color:#3b4b59!important;color:#edf5f8!important}
+.region-card .status{color:#8ed1d7}
+.region-card small,.infra p,.infra small,.replay p,.replay small,.coverage p{color:#a7b2c1!important}
+.region-card button:hover{background:#29434b!important;border-color:#67d6e8!important}
+#map{background:radial-gradient(circle at 50% 45%,#1d2730,#090b10);border-color:#303844}
+.map-card,.map-info{background:#121720}
+.chip{background:#1b202a;border-color:#303844;color:#aab7c6}.chip.on{background:#23353d;border-color:#67d6e8;color:#e7fbff}
+.infra-map{background:#10161d!important;border-color:#303844!important}
+.infra-point{fill:#67d6e8}
+a,.infra-card a,.coverage-detail a{color:#83deec}
+a:hover{color:#b2f1f9}
+.intel-nav button.active{background:#67d6e8;color:#071016}
+.intel-step{border-left-color:#67d6e8}
+@media(max-width:700px){.region-card{border-radius:12px;padding:13px}.card{border-radius:12px}.fold{border-radius:12px}}
