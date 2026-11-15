@@ -31,3 +31,6 @@ button,select,input,summary{font-family:inherit!important}
 @media(max-width:1050px){.suite-tabs{display:flex!important;overflow-x:auto!important;scroll-snap-type:x mandatory;padding:5px!important}.suite-tabs button{flex:0 0 auto;min-width:96px;scroll-snap-align:start}.suite-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:600px){.suite{padding:15px!important;margin-top:15px!important}.suite-head h2{font-size:20px!important}.suite-kpis{gap:8px}.suite-kpi{padding:12px}.suite-kpi strong{font-size:24px}.suite-kpi>span{font-size:9px}.suite-kpi small{font-size:10px}.suite-tabs{margin:16px 0!important}.suite-tabs button{min-height:42px}.suite-card{padding:13px!important}.top-in{height:60px!important}.brand{font-size:15px!important}}
 @media(prefers-reduced-motion:reduce){.suite *{transition:none!important;animation:none!important}}
+
+/* Change intelligence */
+.suite-change-item{padding:8px 0 8px 12px;border-left:2px solid #75d5e5;margin:7px 0;color:#e3edf2;font-size:12px;font-weight:550;background:#1a253010}.suite-source-meta{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}.suite-source-meta .suite-pill{font-size:10px}.suite-tabs button:focus-visible{outline:2px solid #eff5f8;outline-offset:2px}
