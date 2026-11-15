@@ -11,6 +11,7 @@
 <link rel="stylesheet" href="/pulse-ui.css">
 <link rel="stylesheet" href="/map-ui.css">
 <link rel="stylesheet" href="/intelligence.css">
+<link rel="stylesheet" href="/focus-ui.css">
 </head>
 <body>
 <header class="top">
@@ -24,36 +25,37 @@
 </header>
 
 <main class="wrap">
+<nav class="continent-nav" aria-label="Περιοχή"><button data-region="americas" class="active">Αμερική</button><button data-region="europe">Ευρώπη</button><button data-region="asia">Ασία</button><button data-region="all">Παγκόσμια</button></nav>
   <section class="hero">
     <div class="hero-gauge card">
-      <div class="eyebrow">Δείκτης εγγύτητας σε blackout · 0–100</div>
+      <div class="eyebrow">Δείκτης πίεσης · 0–100</div>
       <svg id="gauge" viewBox="0 0 320 190" role="img" aria-label="Δείκτης"></svg>
       <div class="gauge-label"><span class="band" id="band">—</span></div>
       <p class="gauge-sub" id="worst">Φόρτωση ζωντανών μετρήσεων…</p>
     </div>
     <div class="hero-text">
-      <h1>Πόσο κοντά είμαστε<br>σε ένα <em>blackout</em>;</h1>
-      <p class="lede" id="summary">Συλλέγουμε ζωντανές μετρήσεις από διαχειριστές δικτύων και αισθητήρες. Κάθε λεπτό.</p>
+      <h1>Παγκόσμια <em>πίεση δικτύων</em></h1>
+      <p class="lede" id="summary">Μετρήσεις δικτύων · ενημέρωση ανά πηγή.</p>
       <div class="distances" id="distances"></div>
     </div>
   </section>
 
-  <div id="infrastructure-atlas" aria-label="Χάρτης στρατηγικών υποδομών"></div>
+  <details class="fold"><summary>Υποδομές · χάρτης</summary><div id="infrastructure-atlas" aria-label="Χάρτης στρατηγικών υποδομών"></div></details>
 
-  <div id="blackout-replay" aria-label="Ιστορικό στιγμιότυπων"></div>
+  <details class="fold"><summary>Ιστορικό · Replay</summary><div id="blackout-replay" aria-label="Ιστορικό στιγμιότυπων"></div></details>
 
   <div id="nerve-center" aria-label="Παγκόσμια κατάσταση υποδομών"></div>
 
-  <div id="source-health" aria-label="Διαθεσιμότητα πηγών"></div>
+  <details class="fold"><summary>Πηγές · κατάσταση</summary><div id="source-health" aria-label="Διαθεσιμότητα πηγών"></div></details>
 
-  <div id="coverage-root" aria-label="Παγκόσμια κάλυψη χωρών"></div>
+  <details class="fold" open><summary>Χώρες · κάλυψη</summary><div id="coverage-root" aria-label="Παγκόσμια κάλυψη χωρών"></div></details>
 
-  <div id="intelligence-root" aria-label="BLACKOUT Intelligence Lab"></div>
+  <details class="fold"><summary>Intelligence Lab</summary><div id="intelligence-root" aria-label="BLACKOUT Intelligence Lab"></div></details>
 
   <section class="block">
     <div class="block-head">
       <div><div class="eyebrow">01 · Υδρόγειος</div><h2>Πού συμβαίνει</h2></div>
-      <p class="note">Διακοπές Internet ανά χώρα, μερίδιο ηλιακών+αιολικών ανά χώρα και ζωντανή πίεση των δικτύων που μετράμε. Σύρε για περιστροφή, πάτα σε ένα σημείο για λεπτομέρειες.</p>
+      <p class="note">Internet · ενέργεια · δίκτυα</p>
     </div>
     <div class="card map-card">
       <div class="map-bar">
@@ -82,7 +84,7 @@
   <section class="block">
     <div class="block-head">
       <div><div class="eyebrow">03 · Κυβερνοεπιθέσεις</div><h2>Τι αναφέρεται και τι εκμεταλλεύονται τώρα</h2></div>
-      <p class="note">Δεν υπάρχει δημόσιος ζωντανός μετρητής επιθέσεων χωρίς κλειδί. Δείχνουμε ό,τι είναι ελέγξιμο: αναφορές 24 ωρών και τον επίσημο κατάλογο CISA με ευπάθειες που χρησιμοποιούνται σε πραγματικές επιθέσεις.</p>
+      <p class="note">Αναφορές 24h · επιβεβαιωμένες ευπάθειες CISA</p>
     </div>
     <div class="out-stats" id="cyStats"></div>
     <div class="grid2">
@@ -160,5 +162,6 @@
 <script src="/nerve-center.js" defer></script>
 <script src="/infrastructure-atlas.js" defer></script>
 <script src="/blackout-replay.js" defer></script>
+<script src="/focus-ui.js" defer></script>
 </body>
 </html>
