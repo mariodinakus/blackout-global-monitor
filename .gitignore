@@ -1,0 +1,19 @@
+# Local credentials and deployment state
+.env
+.env.*
+!.env.example
+!.env.sample
+.vercel/
+
+# Packages, generated output and logs
+node_modules/
+.next/
+dist/
+build/
+coverage/
+*.log
+*.tmp
+
+# Local operating-system files
+.DS_Store
+Thumbs.db
